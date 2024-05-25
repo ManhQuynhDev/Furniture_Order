@@ -291,7 +291,7 @@ class MainControl : ComponentActivity() {
     fun HomeScreen(innerPadding: PaddingValues = PaddingValues() , navController: NavController) {
         val categoryArr = listOf(
             Category(R.drawable.cart, "Chair"),
-            Category(R.drawable.cart, "Chair"),
+            Category(R.drawable.cart, "Table"),
             Category(R.drawable.cart, "Chair"),
             Category(R.drawable.cart, "Chair"),
             Category(R.drawable.cart, "Chair"),
@@ -311,6 +311,8 @@ class MainControl : ComponentActivity() {
                 start = 15.dp
             )
         ) {
+
+            //Category
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -320,6 +322,8 @@ class MainControl : ComponentActivity() {
                     CategoryItem(icon = category.icon, name = category.name)
                 }
             }
+
+
             Spacer(modifier = Modifier.height(10.dp))
             LazyColumn(
                 modifier = Modifier
