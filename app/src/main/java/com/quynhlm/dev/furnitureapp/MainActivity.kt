@@ -1,6 +1,8 @@
 package com.quynhlm.dev.furnitureapp
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -10,7 +12,6 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,12 +28,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -59,6 +59,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ParagraphStyle
@@ -71,25 +72,26 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.core.graphics.toColorInt
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.quynhlm.dev.furnitureapp.ui.theme.FurnitureAppTheme
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 sealed class Screen(val route: String, val icon: Int, val title: String) {
     object Home : Screen("home", R.drawable.home, "Trang chủ")
-    object History : Screen("history",R.drawable.marker, "Lịch sử")
+    object History : Screen("history", R.drawable.marker, "Lịch sử")
     object Cart : Screen("cart", R.drawable.bell, "Giỏ hàng")
-    object Profile : Screen("profile",R.drawable.person, "Hồ sơ")
+    object Profile : Screen("profile", R.drawable.person, "Hồ sơ")
 }
 
 class MainActivity : ComponentActivity() {
@@ -102,7 +104,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    SmallTopAppBarExample()
+
                 }
             }
         }
@@ -173,7 +175,7 @@ fun SmallTopAppBarExample() {
             SnackbarHost(hostState = snackbarHostState)
         }
     ) { innerPadding ->
-        NavigationGraph(navController = navController , innerPadding)
+        NavigationGraph(navController = navController, innerPadding)
     }
 }
 
@@ -231,25 +233,24 @@ private fun BottomNavigationBar(navController: NavHostController) {
         }
     }
 }
+
 @Composable
 fun NavigationGraph(navController: NavHostController, innerPadding: PaddingValues) {
 
 //         nhận nhiệm vụ xử lí chính cho việc chuyển màn khi ấn vào icon của thanh điều hướng
     // truyền và o 3 tham số : navController là công cụ thuộc thư việ có sẵn của jetpack compose giúp xử lí về bottom nav bar
-    NavHost(navController, startDestination = Screen.Home.route) {
-
-        // tùy vào route object nào sẽ navigate đến fun component đó
-        composable(Screen.Home.route) { HomeScreen(innerPadding) }
-        composable(Screen.History.route) { LoginScreen() }
-        composable(Screen.Cart.route) { RegisterScreen() }
-        composable(Screen.Profile.route) { WelComeScreen() }
-
-    }
+//    NavHost(navController, startDestination = Screen.Home.route) {
+//
+//        // tùy vào route object nào sẽ navigate đến fun component đó
+//        composable(Screen.Home.route) { RegisterScreen(null) }
+//        composable(Screen.History.route) { RegisterScreen(null) }
+//        composable(Screen.Cart.route) { RegisterScreen(null) }
+//    }
 }
-
-@Preview(name = "WelCome", showBackground = true)
+//@Preview(name = "WelCome", showBackground = true)
 @Composable
-fun WelComeScreen() {
+fun WelComeScreen(navController: NavController) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -304,7 +305,9 @@ fun WelComeScreen() {
                 )
             }
             Column {
-                CustomRow(onClick = { /*TODO*/ })
+                CustomRow(onClick = {
+                    navController.navigate("login")
+                })
                 Spacer(modifier = Modifier.height(20.dp))
             }
         }
@@ -312,40 +315,8 @@ fun WelComeScreen() {
 }
 
 @Composable
-fun CustomRow(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier
-            .padding(7.dp)
-            .width(160.dp)
-            .height(60.dp)
-            .clip(RoundedCornerShape(4.dp))
-            .background(Color(0xFF242424))
-            .clickable(onClick = onClick)
-            .then(modifier)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxSize(),  // Fill the size of the Box
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "Get Started",
-                color = Color.White,
-                fontFamily = FontFamily(Font(R.font.gelasio_bold)),
-                fontWeight = FontWeight(600),
-                fontSize = 18.sp
-            )  // Set text color
-        }
-    }
-}
-
-@Preview(name = "Login", showBackground = true)
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavController){
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -402,8 +373,71 @@ fun LoginScreen() {
                     .padding(15.dp), verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                InputRow(title = "Email")
-                InputRowPass(title = "PassWord")
+                var username by remember { mutableStateOf("") }
+                var password by remember { mutableStateOf("") }
+                var passwordVisible by remember { mutableStateOf(false) }
+
+                Column {
+                    Text(
+                        text = "Email",
+                        color = colorResource(id = R.color.graySecond),
+                        fontFamily = FontFamily(Font(R.font.nunitosans_7pt_condensed_light)),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 17.sp
+                    )
+                    TextField(
+                        value = username,
+                        onValueChange = {
+                            username = it
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color("#E0E0E0".toColorInt()),
+                            unfocusedContainerColor = Color.White,
+                            disabledContainerColor = Color.Gray,
+                            unfocusedIndicatorColor = Color.Gray,
+                        ),
+                    )
+                }
+                Column {
+                    Text(
+                        text = "PassWord",
+                        color = colorResource(id = R.color.graySecond),
+                        fontFamily = FontFamily(Font(R.font.nunitosans_7pt_condensed_light)),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 17.sp
+                    )
+
+                    TextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color("#E0E0E0".toColorInt()),
+                            unfocusedContainerColor = Color.White,
+                            disabledContainerColor = Color.Gray,
+                            unfocusedIndicatorColor = Color.Gray,
+                        ),
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        trailingIcon = {
+                            val image =
+                                if (passwordVisible)
+                                    painterResource(id = R.drawable.hide)
+                                else
+                                    painterResource(id = R.drawable.view)
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(
+                                    painter = image,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        })
+                }
                 Text(
                     text = "Forgot Password",
                     color = Color("#303030".toColorInt()),
@@ -414,10 +448,27 @@ fun LoginScreen() {
                     modifier = Modifier
                         .padding(7.dp)
                         .width(285.dp)
-                        .height(50.dp)
+                        .height(50.dp).shadow(elevation = 5.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color(0xFF242424))
-                        .clickable(onClick = {})
+                        .clickable(onClick = {
+                            if(username.isEmpty() || password.isEmpty()){
+                                Toast
+                                    .makeText(context, "Username Empty And PassWord Empty", Toast.LENGTH_SHORT)
+                                    .show()
+                            }else{
+                                if(username.equals("quynhlm.dev" ) && password.equals("12345")) {
+                                    Toast
+                                        .makeText(context, "Login SuccessFully", Toast.LENGTH_SHORT)
+                                        .show()
+                                    navController.navigate("home")
+                                }else{
+                                    Toast
+                                        .makeText(context, "Login Not SuccessFully", Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+                            }
+                        })
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize(),
@@ -430,18 +481,59 @@ fun LoginScreen() {
                             fontFamily = FontFamily(Font(R.font.gelasio_bold)),
                             fontWeight = FontWeight(600),
                             fontSize = 17.sp
-                        )  // Set text color
+                        )
                     }
                 }
-                Text(text = "SIGN UP")
+                Text(
+                    text = "SIGN UP",
+                    modifier = Modifier.clickable {
+                        navController.navigate("signup")
+                    }
+                )
             }
-
         }
         Column {
 
         }
     }
 }
+
+@Composable
+fun CustomRow(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .padding(7.dp)
+            .width(160.dp)
+            .height(60.dp)
+            .clip(RoundedCornerShape(4.dp))
+            .background(Color(0xFF242424))
+            .clickable(onClick = onClick)
+            .then(modifier)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize(),  // Fill the size of the Box
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Get Started",
+                color = Color.White,
+                fontFamily = FontFamily(Font(R.font.gelasio_bold)),
+                fontWeight = FontWeight(600),
+                fontSize = 18.sp
+            )  // Set text color
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun LoginScreen() {
+//
+//}
 
 @Composable
 fun InputRow(title: String) {
@@ -507,9 +599,11 @@ fun CategoryItem(icon: Int, name: String) {
 
 @Composable
 fun CustomTextField() {
+    var username by remember { mutableStateOf("") }
     TextField(
-        value = "",
+        value = username,
         onValueChange = {
+
         },
         modifier = Modifier
             .fillMaxWidth(),
@@ -522,9 +616,9 @@ fun CustomTextField() {
     )
 }
 
-@Preview(name = "Register", showBackground = true)
+//@Preview(name = "Register", showBackground = true)
 @Composable
-fun RegisterScreen() {
+fun RegisterScreen(navController : NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -636,7 +730,7 @@ fun RegisterScreen() {
                     ) {
                         append("SIGN IN")
                     }
-                })
+                }, modifier = Modifier.clickable { navController.popBackStack() })
             }
         }
         Column {
@@ -714,82 +808,82 @@ fun PasswordTextField() {
     )
 }
 
-private class Category(val icon: Int, val name: String)
-private class Product(val image: Int, val name: String, val price: Double)
+public class Category(val icon: Int, val name: String)
+
+//@Composable
+//fun HomeScreen(innerPadding: PaddingValues = PaddingValues()) {
+//    val categoryArr = listOf(
+//        Category(R.drawable.cart, "Chair"),
+//        Category(R.drawable.cart, "Chair"),
+//        Category(R.drawable.cart, "Chair"),
+//        Category(R.drawable.cart, "Chair"),
+//        Category(R.drawable.cart, "Chair"),
+//        Category(R.drawable.cart, "Chair"),
+//        Category(R.drawable.cart, "Chair"),
+//        Category(R.drawable.cart, "Chair"),
+//        Category(R.drawable.cart, "Chair"),
+//        Category(R.drawable.cart, "Chair"),
+//        Category(R.drawable.cart, "Chair"),
+//        Category(R.drawable.cart, "Chair")
+//    )
+//    val scrollState = rememberScrollState()
+//    val productArr = listOf(
+//        Product(R.drawable.image1, "Black Simple Lamp", 12.00),
+//        Product(R.drawable.image2, "Black Simple Lamp", 12.00),
+//        Product(R.drawable.image3, "Black Simple Lamp", 12.00),
+//        Product(R.drawable.image1, "Black Simple Lamp", 12.00),
+//        Product(R.drawable.image1, "Black Simple Lamp", 12.00),
+//        Product(R.drawable.image2, "Black Simple Lamp", 12.00),
+//        Product(R.drawable.image3, "Black Simple Lamp", 12.00),
+//        Product(R.drawable.image1, "Black Simple Lamp", 12.00),
+//    )
+//
+//    Column(
+//        modifier = Modifier.padding(
+//            top = innerPadding.calculateTopPadding() + 20.dp,
+//            end = 20.dp,
+//            start = 20.dp
+//        )
+//    ) {
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .horizontalScroll(scrollState)
+//        ) {
+//            categoryArr.forEach { category ->
+//                CategoryItem(icon = category.icon, name = category.name)
+//            }
+//        }
+//        Spacer(modifier = Modifier.height(10.dp))
+//        LazyColumn(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//        ) {
+//            items(productArr.chunked(2)) { productRow ->
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.SpaceBetween
+//                ) {
+//                    for (product in productRow) {
+//                        ProductItem(
+//                            image = product.image,
+//                            name = product.name,
+//                            price = product.price
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 @Composable
-fun HomeScreen(innerPadding: PaddingValues = PaddingValues()) {
-    val categoryArr = listOf(
-        Category(R.drawable.cart, "Chair"),
-        Category(R.drawable.cart, "Chair"),
-        Category(R.drawable.cart, "Chair"),
-        Category(R.drawable.cart, "Chair"),
-        Category(R.drawable.cart, "Chair"),
-        Category(R.drawable.cart, "Chair"),
-        Category(R.drawable.cart, "Chair"),
-        Category(R.drawable.cart, "Chair"),
-        Category(R.drawable.cart, "Chair"),
-        Category(R.drawable.cart, "Chair"),
-        Category(R.drawable.cart, "Chair"),
-        Category(R.drawable.cart, "Chair")
-    )
-    val scrollState = rememberScrollState()
-    val productArr = listOf(
-        Product(R.drawable.image1, "Black Simple Lamp", 12.00),
-        Product(R.drawable.image2, "Black Simple Lamp", 12.00),
-        Product(R.drawable.image3, "Black Simple Lamp", 12.00),
-        Product(R.drawable.image1, "Black Simple Lamp", 12.00),
-        Product(R.drawable.image1, "Black Simple Lamp", 12.00),
-        Product(R.drawable.image2, "Black Simple Lamp", 12.00),
-        Product(R.drawable.image3, "Black Simple Lamp", 12.00),
-        Product(R.drawable.image1, "Black Simple Lamp", 12.00),
-    )
-
-    Column(
-        modifier = Modifier.padding(
-            top = innerPadding.calculateTopPadding() + 20.dp,
-            end = 20.dp,
-            start = 20.dp
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(scrollState)
-        ) {
-            categoryArr.forEach { category ->
-                CategoryItem(icon = category.icon, name = category.name)
-            }
-        }
-        Spacer(modifier = Modifier.height(10.dp))
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            items(productArr.chunked(2)) { productRow ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    for (product in productRow) {
-                        ProductItem(
-                            image = product.image,
-                            name = product.name,
-                            price = product.price
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ProductItem(image : Int, name : String, price: Double) {
+fun ProductItem(image: Int, name: String, price: Double , navController: NavController) {
     Column(
         modifier = Modifier
             .width(165.dp)
-            .height(253.dp),
+            .height(253.dp).
+        clickable { navController.navigate("detail") },
         verticalArrangement = Arrangement.SpaceAround,
     ) {
         Box(
@@ -850,7 +944,127 @@ fun ProductItem(image : Int, name : String, price: Double) {
     }
 }
 
-@Preview(name = "Main", showBackground = true , device = "id:pixel_2_xl")
+@Composable
+fun FavoriteItem(icon : Int , name : String , price : Double){
+    Row (modifier = Modifier
+        .fillMaxWidth()
+        .height(110.dp)
+        .background(Color.White),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically){
+        Image(painter = painterResource(id = icon), contentDescription = null, modifier = Modifier
+            .width(110.dp)
+            .height(120.dp), contentScale = ContentScale.FillBounds)
+
+        Column (modifier = Modifier
+            .width(200.dp)
+            .padding(start = 10.dp)
+            .fillMaxHeight()) {
+            Text(text = name, fontSize = 15.sp, fontWeight = FontWeight(600), color = colorResource(
+                id = R.color.gray
+            ), fontFamily = FontFamily(
+                Font(R.font.nunitosans_7pt_condensed_light)
+            ))
+            Spacer(modifier = Modifier.height(3.dp))
+            Text(text = "\$ " + price, fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily(
+                Font(R.font.nunitosans_7pt_condensed_bold)
+            ))
+        }
+        Column (modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween, horizontalAlignment = Alignment.CenterHorizontally){
+            Icon(painter = painterResource(id = R.drawable.delete), contentDescription = null, modifier = Modifier.size(24.dp))
+
+            Row {
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(painter = painterResource(id = R.drawable.bag), contentDescription = null, modifier = Modifier.size(24.dp))
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun CartItem(icon : Int , name : String , price : Double){
+    Row (modifier = Modifier
+        .fillMaxWidth()
+        .height(110.dp)
+        .background(Color.White),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically){
+        Image(painter = painterResource(id = icon), contentDescription = null, modifier = Modifier
+            .width(110.dp)
+            .height(120.dp), contentScale = ContentScale.FillBounds)
+
+        Column (modifier = Modifier
+            .width(200.dp)
+            .padding(start = 10.dp)
+            .fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceBetween) {
+            Column {
+                Text(text = name, fontSize = 15.sp, fontWeight = FontWeight(600), color = colorResource(
+                    id = R.color.gray
+                ), fontFamily = FontFamily(
+                    Font(R.font.nunitosans_7pt_condensed_light)
+                ))
+                Spacer(modifier = Modifier.height(3.dp))
+                Text(text = "\$ "+price, fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily(
+                    Font(R.font.nunitosans_7pt_condensed_bold)
+                ))
+            }
+            Row(
+                modifier = Modifier.width(113.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(color = Color("#E0E0E0".toColorInt())),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.add),
+                        contentDescription = null,
+                        modifier = Modifier.size(13.dp)
+                    )
+                }
+                Text(
+                    text = "01",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight(700),
+                    fontFamily = FontFamily(
+                        Font(R.font.nunitosans_7pt_condensed_bold)
+                    )
+                )
+                Box(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(color = Color("#E0E0E0".toColorInt())),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.apart),
+                        contentDescription = null,
+                        modifier = Modifier.size(13.dp)
+                    )
+                }
+            }
+
+
+        }
+        Column (modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween, horizontalAlignment = Alignment.CenterHorizontally){
+            Icon(painter = painterResource(id = R.drawable.delete), contentDescription = null, modifier = Modifier.size(24.dp))
+
+            Row {
+
+            }
+        }
+    }
+}
+
+//@Preview(name = "Main", showBackground = true, device = "id:pixel_2_xl")
 @Composable
 fun GreetingPreview() {
     FurnitureAppTheme {
@@ -858,56 +1072,280 @@ fun GreetingPreview() {
     }
 }
 
-@Preview(name = "Details", showBackground = true , device = "id:pixel_2_xl")
 @Composable
-fun DetailsProduct(){
-    Column (modifier = Modifier
-        .fillMaxSize()
-        .background(Color.White)) {
+fun Custom(navController: NavController) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(390.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Box {
+
+                }
+                Image(
+                    painter = painterResource(id = R.drawable.imagedetails),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(330.dp)
+                        .fillMaxHeight()
+                        .shadow(
+                            elevation = 2.dp,
+                            shape = RoundedCornerShape(bottomStart = 52.dp)
+                        )
+                        .zIndex(1f),
+                    contentScale = ContentScale.FillBounds
+                )
+            }
+        }
+        Box(
+            modifier = Modifier
+                .width(130.dp)
+
+                .fillMaxHeight()
+        ) {
+            Column (modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally){
+                Row(
+                    modifier = Modifier
+                        .size(45.dp)
+                        .clickable { navController.navigateUp() }
+                        .background(color = Color.White, RoundedCornerShape(14.dp))
+                        .shadow(
+                            elevation = 0.dp,
+                            shape = RoundedCornerShape(14.dp),
+                            clip = true
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.arrowback),
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                Column (modifier = Modifier
+                    .height(192.dp)
+                    .shadow(
+                        elevation = 4.dp,
+                        shape = RoundedCornerShape(40.dp),
+                        clip = true
+                    )
+                    .width(64.dp)
+                    .background(Color.White, shape = RoundedCornerShape(40.dp)),
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    Image(painter = painterResource(id = R.drawable.color1), contentDescription = null, modifier = Modifier.size(34.dp))
+                    Image(painter = painterResource(id = R.drawable.color2), contentDescription = null, modifier = Modifier.size(34.dp))
+                    Image(painter = painterResource(id = R.drawable.color3), contentDescription = null, modifier = Modifier.size(34.dp))
+                }
+
+                Row{
+
+                }
+            }
+
+        }
+    }
+}
+
+@Preview(name = "Details", showBackground = true, device = "id:pixel_4a")
+@Composable
+fun NotificationItem(){
+    Row (modifier = Modifier
+        .fillMaxWidth()
+        .height(100.dp)
+        .background(Color.White),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically){
+        Image(painter = painterResource(id = R.drawable.image2), contentDescription = null, modifier = Modifier
+            .width(100.dp)
+            .fillMaxHeight(), contentScale = ContentScale.FillBounds)
+
+        Column (modifier = Modifier
+            .padding(start = 10.dp)
+            .fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceBetween) {
+            Column (modifier = Modifier.padding(end = 10.dp)){
+                Text(text = "Your order #123456789 has been confirmed", maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily(
+                    Font(R.font.nunitosans_7pt_condensed_bold)
+                ))
+                Text(text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Turpis pretium et in arcu adipiscing nec. Turpis pretium et in arcu adipiscing nec.", fontSize = 13.sp, fontWeight = FontWeight(400), color = colorResource(
+                    id = R.color.gray
+                ), fontFamily = FontFamily(
+                    Font(R.font.nunitosans_7pt_condensed_light)
+                ), textAlign = TextAlign.Justify,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis)
+                Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
+                    Text(text = "")
+                    Text(text = "New", fontSize = 15.sp, fontWeight = FontWeight(800), color = Color("#27AE60".toColorInt()))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DetailsProduct(navController: NavController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        Custom(navController)
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White) // Đặt background cho Box
+                .padding(end = 20.dp, start = 20.dp, top = 10.dp),
+            verticalArrangement = Arrangement.SpaceAround
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(450.dp)
+            Text(
+                text = "Minimal Stand",
+                fontSize = 24.sp,
+                fontWeight = FontWeight(500),
+                fontFamily = FontFamily(Font(R.font.gelasio_bold))
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "\$ 50",
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight(700),
+                    fontFamily = FontFamily(Font(R.font.nunitosans_7pt_condensed_bold))
+                )
+                Row(
+                    modifier = Modifier.width(113.dp),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(color = Color("#E0E0E0".toColorInt())),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.add),
+                            contentDescription = null,
+                            modifier = Modifier.size(13.dp)
+                        )
+                    }
+                    Text(
+                        text = "01",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight(700),
+                        fontFamily = FontFamily(
+                            Font(R.font.nunitosans_7pt_condensed_bold)
+                        )
+                    )
+                    Box(
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(color = Color("#E0E0E0".toColorInt())),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.apart),
+                            contentDescription = null,
+                            modifier = Modifier.size(13.dp)
+                        )
+                    }
+                }
+            }
+            Row(modifier = Modifier.width(200.dp), verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = painterResource(id = R.drawable.star),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = "4.5",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight(700),
+                    fontFamily = FontFamily(
+                        Font(R.font.nunitosans_7pt_condensed_bold)
+                    ),
+                    modifier = Modifier.padding(7.dp)
+                )
+                Text(
+                    text = "(50 reviews)",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight(500),
+                    color = Color("#808080".toColorInt()),
+                    fontFamily = FontFamily(
+                        Font(R.font.nunitosans_7pt_condensed_bold)
+                    ),
+                    modifier = Modifier.padding(start = 15.dp).clickable {
+                        navController.navigate("rating")
+                    }
+                )
+            }
+            Text(
+                text = "Minimal Stand is made of by natural wood. The design that is very simple and minimal. This is truly one of the best furnitures in any family for now. With 3 different colors, you can easily select the best match for your home. ",
+                fontSize = 15.sp,
+                textAlign = TextAlign.Justify,
+                fontWeight = FontWeight(500),
+                color = Color("#606060".toColorInt()),
+                fontFamily = FontFamily(
+                    Font(R.font.nunitosans_7pt_condensed_light)
+                )
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    modifier = Modifier
+                        .size(60.dp)
+                        .shadow(elevation = 2.dp, RoundedCornerShape(8.dp))
+                        .background(color = Color("#F5F5F5".toColorInt())),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
                 ) {
-                    Row {
-                        // Add any content you want in the left column
-                    }
                     Image(
-                        painter = painterResource(id = R.drawable.imagedetails),
+                        painter = painterResource(id = R.drawable.marker),
                         contentDescription = null,
-                        modifier = Modifier
-                            .width(355.dp)
-                            .fillMaxHeight()
-                            .shadow(
-                                elevation = 2.dp,
-                                shape = RoundedCornerShape(bottomStart = 52.dp)
-                            )
-                            .zIndex(1f),
-                        contentScale = ContentScale.FillBounds
+                        modifier = Modifier.size(22.dp)
                     )
                 }
                 Box(
-                    modifier = Modifier.size(50.dp),
-                    contentAlignment = Alignment.TopStart
+                    modifier = Modifier
+                        .padding(7.dp)
+                        .width(270.dp)
+                        .height(60.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFF242424))
+                        .clickable(onClick = {
+                            navController.navigate("cart")
+                        })
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.arrowback),
-                            contentDescription = null,
-                            modifier = Modifier.size(30.dp)
+                        Text(
+                            text = "Add to cart",
+                            color = Color.White,
+                            fontFamily = FontFamily(Font(R.font.nunitosans_7pt_condensed_light)),
+                            fontWeight = FontWeight(600),
+                            fontSize = 17.sp
                         )
                     }
                 }
