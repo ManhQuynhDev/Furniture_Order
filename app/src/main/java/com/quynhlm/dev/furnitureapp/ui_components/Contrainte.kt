@@ -2,14 +2,19 @@ package com.quynhlm.dev.furnitureapp.ui_components
 
 import android.content.Context
 import android.widget.Toast
+import android.widget.Toolbar
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -57,7 +62,7 @@ fun CustomButton(
 }
 //Customer Input
 @Composable
-fun InputText(title: String, textState: MutableState<String>) {
+fun InputUsername(title: String, username : String,onUsernameChange: (String) -> Unit) {
     Column {
         Text(
             text = title,
@@ -67,10 +72,8 @@ fun InputText(title: String, textState: MutableState<String>) {
             fontSize = 17.sp
         )
         TextField(
-            value = textState.value,
-            onValueChange = { newText ->
-                textState.value = newText
-            },
+            value = username,
+            onValueChange = onUsernameChange,
             modifier = Modifier
                 .fillMaxWidth(),
             colors = TextFieldDefaults.colors(
@@ -82,12 +85,13 @@ fun InputText(title: String, textState: MutableState<String>) {
         )
     }
 }
-
 @Composable
 fun InputPassWord(
     title: String,
-    password: MutableState<String>,
-    passwordVisible: MutableState<Boolean>
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    visible: Boolean,
+    onPasswordVisible: (Boolean) -> Unit,
 ) {
     Column {
         Text(
@@ -98,8 +102,8 @@ fun InputPassWord(
             fontSize = 17.sp
         )
         TextField(
-            value = password.value,
-            onValueChange = { password.value = it },
+            value = password,
+            onValueChange = onPasswordChange,
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth(),
@@ -109,15 +113,15 @@ fun InputPassWord(
                 disabledContainerColor = Color.Gray,
                 unfocusedIndicatorColor = Color.Gray,
             ),
-            visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+            visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             trailingIcon = {
                 val image =
-                    if (passwordVisible.value)
+                    if (visible)
                         painterResource(id = R.drawable.hide)
                     else
                         painterResource(id = R.drawable.view)
-                IconButton(onClick = { passwordVisible.value = !passwordVisible.value }) {
+                IconButton(onClick = { onPasswordVisible(visible) }) {
                     Icon(
                         painter = image,
                         contentDescription = null,
@@ -130,4 +134,36 @@ fun InputPassWord(
 
 fun showMessage(context: Context, message:String){
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+}
+
+@Composable
+fun DividerCustom() {
+    Divider(
+        color = Color("#BDBDBD".toColorInt()),
+        thickness = 2.dp,
+        modifier = Modifier.width(105.dp)
+    )
+}
+
+@Composable
+fun ToolbarCustom(){
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(70.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            DividerCustom()
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = null,
+                modifier = Modifier.size(75.dp)
+            )
+            DividerCustom()
+        }
+    }
 }

@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.quynhlm.dev.furnitureapp.Response.ResponseResult
 import com.quynhlm.dev.furnitureapp.models.Order
-import com.quynhlm.dev.furnitureapp.models.Shipment
 import com.quynhlm.dev.furnitureapp.services.RetrofitInstance
 import kotlinx.coroutines.launch
 

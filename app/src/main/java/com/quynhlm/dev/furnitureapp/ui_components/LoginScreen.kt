@@ -1,6 +1,4 @@
 package com.quynhlm.dev.furnitureapp.ui_components
-
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,16 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,9 +30,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,21 +40,11 @@ import com.quynhlm.dev.furnitureapp.R
 import com.quynhlm.dev.furnitureapp.core.validation.EmptyValid
 import com.quynhlm.dev.furnitureapp.models.User
 import com.quynhlm.dev.furnitureapp.viewmodel.LoginViewModel
-import com.quynhlm.dev.furnitureapp.viewmodel.RegisterViewModel
-
-@Preview(showBackground = true , device = "id:pixel_4a")
 @Composable
-fun demo(){
-    LoginScreen(navController = null)
-}
-
-@Composable
-fun LoginScreen(navController: NavController?){
+fun LoginScreen(navController: NavController?) {
     val context = LocalContext.current
-    val emptyValid : EmptyValid = EmptyValid()
-
+    val emptyValid = EmptyValid()
     val loginViewModel: LoginViewModel = viewModel()
-    val loginState by loginViewModel.loginState
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -75,33 +53,7 @@ fun LoginScreen(navController: NavController?){
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Divider(
-                    color = Color("#BDBDBD".toColorInt()),
-                    thickness = 2.dp,
-                    modifier = Modifier.width(105.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = null,
-                    modifier = Modifier.size(75.dp)
-                )
-                Divider(
-                    color = Color("#BDBDBD".toColorInt()),
-                    thickness = 2.dp,
-                    modifier = Modifier.width(105.dp)
-                )
-            }
-        }
+        ToolbarCustom()
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -126,71 +78,18 @@ fun LoginScreen(navController: NavController?){
                 var username by remember { mutableStateOf("") }
                 var password by remember { mutableStateOf("") }
                 var passwordVisible by remember { mutableStateOf(false) }
-
-                Column {
-                    Text(
-                        text = "Username",
-                        color = colorResource(id = R.color.graySecond),
-                        fontFamily = FontFamily(Font(R.font.nunitosans_7pt_condensed_light)),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp
-                    )
-                    TextField(
-                        value = username,
-                        onValueChange = { newText ->
-                            username = newText
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color("#E0E0E0".toColorInt()),
-                            unfocusedContainerColor = Color.White,
-                            disabledContainerColor = Color.Gray,
-                            unfocusedIndicatorColor = Color.Gray,
-                        ),
-                    )
-                }
-
-                //Password
-
-                Column {
-                    Text(
-                        text = "PassWord",
-                        color = colorResource(id = R.color.graySecond),
-                        fontFamily = FontFamily(Font(R.font.nunitosans_7pt_condensed_light)),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp
-                    )
-                    TextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        singleLine = true,
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color("#E0E0E0".toColorInt()),
-                            unfocusedContainerColor = Color.White,
-                            disabledContainerColor = Color.Gray,
-                            unfocusedIndicatorColor = Color.Gray,
-                        ),
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        trailingIcon = {
-                            val image =
-                                if (passwordVisible)
-                                    painterResource(id = R.drawable.hide)
-                                else
-                                    painterResource(id = R.drawable.view)
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(
-                                    painter = image,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                        })
-                }
-
+                //Username input
+                InputUsername(
+                    title = "Username",
+                    username = username,
+                    onUsernameChange = { username = it })
+                //Password input
+                InputPassWord(
+                    title = "PassWord",
+                    password = password,
+                    onPasswordChange = { password = it },
+                    visible = passwordVisible,
+                    onPasswordVisible = { passwordVisible = !it })
                 Text(
                     text = "Forgot Password",
                     color = Color("#303030".toColorInt()),
@@ -207,16 +106,24 @@ fun LoginScreen(navController: NavController?){
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color(0xFF242424))
                         .clickable(onClick = {
-                            if (!emptyValid.isEmptyLogin(username = username, password = password)) {
+                            if (!emptyValid.isEmptyLogin(
+                                    username = username,
+                                    password = password
+                                )
+                            ) {
                                 showMessage(
                                     context = context,
                                     message = "Please username and password not empty"
                                 )
                             } else {
-                                val  user = User()
+                                val user = User()
                                 user.username = username
                                 user.password = password
-                                loginViewModel.loginAccount(user)
+                                if (loginViewModel.loginAccount(user)) {
+                                    showMessage(context, "Create account successfully")
+                                } else {
+                                    showMessage(context, "Create account not successfully")
+                                }
                             }
                         }),
                     textStyle = TextStyle(
@@ -234,18 +141,6 @@ fun LoginScreen(navController: NavController?){
                 )
             }
         }
-        Column {
-            loginState?.let {
-                Log.e("TAG", "LoginScreen: " + it.status)
-                Log.e("TAG", "LoginScreen: " + it.message)
-                Log.e("TAG", "LoginScreen: " + it.data)
-                if (it.data == true) {
-                    showMessage(context, "Login successfully")
-                    navController!!.navigate("home")
-                } else {
-                    showMessage(context, "Login not successfully")
-                }
-            }
-        }
+        Column {}
     }
 }

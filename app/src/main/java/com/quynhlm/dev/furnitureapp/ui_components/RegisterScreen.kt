@@ -50,6 +50,7 @@ import androidx.core.graphics.toColorInt
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.quynhlm.dev.furnitureapp.R
+import com.quynhlm.dev.furnitureapp.core.validation.EmailFormat
 import com.quynhlm.dev.furnitureapp.core.validation.EmptyValid
 import com.quynhlm.dev.furnitureapp.models.User
 import com.quynhlm.dev.furnitureapp.viewmodel.RegisterViewModel
@@ -58,9 +59,10 @@ import com.quynhlm.dev.furnitureapp.viewmodel.RegisterViewModel
 fun RegisterScreen(navController: NavController) {
     val context = LocalContext.current
     var emptyValid = EmptyValid()
+    val emailFormat = EmailFormat()
 
     val registerViewModel: RegisterViewModel = viewModel()
-    val registerState by registerViewModel.registerState
+//    val registerState by registerViewModel.registerState
 
     Column(
         modifier = Modifier
@@ -70,34 +72,7 @@ fun RegisterScreen(navController: NavController) {
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Divider(
-                    color = Color("#BDBDBD".toColorInt()),
-                    thickness = 2.dp,
-                    modifier = Modifier.width(105.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = null,
-                    modifier = Modifier.size(75.dp)
-                )
-                Divider(
-                    color = Color("#BDBDBD".toColorInt()),
-                    thickness = 2.dp,
-                    modifier = Modifier.width(105.dp)
-                )
-            }
-        }
+        ToolbarCustom()
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -123,141 +98,20 @@ fun RegisterScreen(navController: NavController) {
                     .padding(15.dp), verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 var username by remember { mutableStateOf("") }
                 var email by remember { mutableStateOf("") }
                 var password by remember { mutableStateOf("") }
                 var confirmPassword by remember { mutableStateOf("") }
                 var passwordVisible by remember { mutableStateOf(false) }
-
-                //Username
-                Column {
-                    Text(
-                        text = "Username",
-                        color = colorResource(id = R.color.graySecond),
-                        fontFamily = FontFamily(Font(R.font.nunitosans_7pt_condensed_light)),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp
-                    )
-                    TextField(
-                        value = username,
-                        onValueChange = { newText ->
-                            username = newText
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color("#E0E0E0".toColorInt()),
-                            unfocusedContainerColor = Color.White,
-                            disabledContainerColor = Color.Gray,
-                            unfocusedIndicatorColor = Color.Gray,
-                        ),
-                    )
-                }
-
-                //Email
-                Column {
-                    Text(
-                        text = "Email",
-                        color = colorResource(id = R.color.graySecond),
-                        fontFamily = FontFamily(Font(R.font.nunitosans_7pt_condensed_light)),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp
-                    )
-                    TextField(
-                        value = email,
-                        onValueChange = { newText ->
-                            email = newText
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color("#E0E0E0".toColorInt()),
-                            unfocusedContainerColor = Color.White,
-                            disabledContainerColor = Color.Gray,
-                            unfocusedIndicatorColor = Color.Gray,
-                        ),
-                    )
-                }
-
-                //Password
-
-                Column {
-                    Text(
-                        text = "PassWord",
-                        color = colorResource(id = R.color.graySecond),
-                        fontFamily = FontFamily(Font(R.font.nunitosans_7pt_condensed_light)),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp
-                    )
-                    TextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        singleLine = true,
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color("#E0E0E0".toColorInt()),
-                            unfocusedContainerColor = Color.White,
-                            disabledContainerColor = Color.Gray,
-                            unfocusedIndicatorColor = Color.Gray,
-                        ),
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        trailingIcon = {
-                            val image =
-                                if (passwordVisible)
-                                    painterResource(id = R.drawable.hide)
-                                else
-                                    painterResource(id = R.drawable.view)
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(
-                                    painter = image,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                        })
-                }
-
-                Column {
-                    Text(
-                        text = "Confirm",
-                        color = colorResource(id = R.color.graySecond),
-                        fontFamily = FontFamily(Font(R.font.nunitosans_7pt_condensed_light)),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp
-                    )
-                    TextField(
-                        value = confirmPassword,
-                        onValueChange = { confirmPassword = it },
-                        singleLine = true,
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color("#E0E0E0".toColorInt()),
-                            unfocusedContainerColor = Color.White,
-                            disabledContainerColor = Color.Gray,
-                            unfocusedIndicatorColor = Color.Gray,
-                        ),
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        trailingIcon = {
-                            val image =
-                                if (passwordVisible)
-                                    painterResource(id = R.drawable.hide)
-                                else
-                                    painterResource(id = R.drawable.view)
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(
-                                    painter = image,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                        })
-                }
-
+                //Username input
+                InputUsername(title = "Username", username = username , onUsernameChange = { username = it })
+                //Email input
+                InputUsername(title = "Email", username = email , onUsernameChange = { email = it })
+                //Password input
+                InputPassWord(title = "PassWord",password = password, onPasswordChange = {password = it},visible = passwordVisible , onPasswordVisible = {passwordVisible = !it})
+                //Confirm input
+                InputPassWord(title = "Confirm",password = confirmPassword, onPasswordChange = {confirmPassword = it},visible = passwordVisible , onPasswordVisible = {passwordVisible = !it})
+                //Button Click
                 CustomButton(
                     title = "SIGN UP",
                     modifier = Modifier
@@ -274,6 +128,13 @@ fun RegisterScreen(navController: NavController) {
                                     "Please fill in all the fields correctly."
                                 )
                             } else {
+                                //Check email
+                                if(!emailFormat.isEmailFormat(email)){
+                                    showMessage(
+                                        context = context,
+                                        "Email is not format"
+                                    )
+                                }
                                 val isSame = emptyValid.isTheSame(
                                     password = password,
                                     confirm = confirmPassword
@@ -288,7 +149,11 @@ fun RegisterScreen(navController: NavController) {
                                     user.username = username
                                     user.password = password
 
-                                    registerViewModel.registerUser(user)
+                                    if(registerViewModel.registerUser(user)){
+                                        showMessage(context, "Create account successfully")
+                                    }else{
+                                        showMessage(context, "Create account not successfully")
+                                    }
                                 }
                             }
                         }),
@@ -323,15 +188,6 @@ fun RegisterScreen(navController: NavController) {
                 }, modifier = Modifier.clickable { navController.popBackStack() })
             }
         }
-        Column {
-            registerState?.let {
-                Log.e("TAG", "RegisterScreen: " + it.message)
-                if (it.status.equals("ok")) {
-                    showMessage(context, "Create account successfully")
-                } else {
-                    showMessage(context, "Create account not successfully")
-                }
-            }
-        }
+        Column {}
     }
 }

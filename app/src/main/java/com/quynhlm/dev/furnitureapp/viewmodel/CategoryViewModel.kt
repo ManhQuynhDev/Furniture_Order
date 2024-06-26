@@ -4,13 +4,14 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.quynhlm.dev.furnitureapp.Response.CategoryResponse
+import com.quynhlm.dev.furnitureapp.Response.ResponseResult
+import com.quynhlm.dev.furnitureapp.models.Category
 import com.quynhlm.dev.furnitureapp.services.RetrofitInstance
 import kotlinx.coroutines.launch
 
 class CategoryViewModel : ViewModel(){
-    private val _categoryState = mutableStateOf<CategoryResponse?>(null)
-    val categoryState: State<CategoryResponse?> = _categoryState
+    private val _categoryState = mutableStateOf<ResponseResult<List<Category>>?>(null)
+    val categoryState: State<ResponseResult<List<Category>>?> = _categoryState
 
     fun getAllCategory() {
         viewModelScope.launch {
@@ -19,10 +20,10 @@ class CategoryViewModel : ViewModel(){
                 if(response.isSuccessful){
                     _categoryState.value = response.body()
                 }else{
-                    _categoryState.value = CategoryResponse("failed", "Login failed",null)
+                    _categoryState.value = ResponseResult("failed", "Get data not success",null)
                 }
             }catch (e : Exception){
-                _categoryState.value = CategoryResponse("failed", "Network error: ${e.message}",null)
+                _categoryState.value = ResponseResult("failed", "Network error: ${e.message}",null)
             }
         }
     }

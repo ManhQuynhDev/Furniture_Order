@@ -1,4 +1,4 @@
-package com.quynhlm.dev.furnitureapp.Database.DB
+package com.quynhlm.dev.furnitureapp.Database.Dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao

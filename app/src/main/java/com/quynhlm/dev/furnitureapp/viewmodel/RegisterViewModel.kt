@@ -6,29 +6,35 @@ import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.State
 import androidx.lifecycle.viewModelScope
 import com.quynhlm.dev.furnitureapp.models.User
-import com.quynhlm.dev.furnitureapp.Response.ResponseObject
+import com.quynhlm.dev.furnitureapp.Response.ResponseResult
 import com.quynhlm.dev.furnitureapp.services.RetrofitInstance
 import kotlinx.coroutines.launch
 
 class RegisterViewModel : ViewModel(){
-    private val _registerState = mutableStateOf<ResponseObject?>(null)
-    val registerState: State<ResponseObject?> = _registerState
+    //Status data
+//    private val _registerState = mutableStateOf<ResponseResult<Any>?>(null)
+//    val registerState: State<ResponseResult<Any>?> = _registerState
 
-    fun registerUser(user: User) {
+    //Function Register User
+    fun registerUser(user: User) : Boolean {
+        var isCheckSuccess = true
         viewModelScope.launch {
             try {
                 val response = RetrofitInstance.api.registerUser(user)
                 if (response.isSuccessful) {
-                    _registerState.value = response.body()
+                    isCheckSuccess = true
                     Log.e("TAG", "registerUser Body: "+ response.body())
                 } else {
-                    _registerState.value = ResponseObject("failed", "Registration failed","")
+                    isCheckSuccess = false
+//                    _registerState.value = ResponseResult("failed", "Registration failed","")
                     Log.e("Tag","registerUser : " + response.code())
                 }
             } catch (e: Exception) {
-                _registerState.value = ResponseObject("failed", "Network error: ${e.message}","")
+                isCheckSuccess = false
+//                _registerState.value = ResponseResult("failed", "Network error: ${e.message}","")
                 Log.e("TAG", "registerUser: "+ e.message)
             }
         }
+        return isCheckSuccess
     }
 }

@@ -1,9 +1,7 @@
 package com.quynhlm.dev.furnitureapp.services
 
-import com.quynhlm.dev.furnitureapp.Response.CategoryResponse
-import com.quynhlm.dev.furnitureapp.Response.ProductResponse
-import com.quynhlm.dev.furnitureapp.Response.ResponseObject
 import com.quynhlm.dev.furnitureapp.Response.ResponseResult
+import com.quynhlm.dev.furnitureapp.models.Category
 import com.quynhlm.dev.furnitureapp.models.Order
 import com.quynhlm.dev.furnitureapp.models.Product
 import com.quynhlm.dev.furnitureapp.models.Shipment
@@ -20,16 +18,16 @@ import retrofit2.http.Path
 
 interface ApiService {
     @POST("users")
-    suspend fun registerUser(@Body user: User): Response<ResponseObject>
+    suspend fun registerUser(@Body user: User): Response<ResponseResult<Any>>
 
     @POST("users/login")
-    suspend fun loginAccount(@Body user: User) : Response<ResponseObject>
+    suspend fun loginAccount(@Body user: User) : Response<ResponseResult<Any>>
 
     @GET("category")
-    suspend fun getAllCategory() : Response<CategoryResponse>
+    suspend fun getAllCategory() : Response<ResponseResult<List<Category>>>
 
     @GET("product")
-    suspend fun getAllProduct() : Response<ProductResponse>
+    suspend fun getAllProduct() : Response<ResponseResult<List<Product>>>
 
     @GET("product/{product_id}")
     suspend fun getAnProductById(@Path("product_id") product_id : Int) : Response<ResponseResult<Product>>
